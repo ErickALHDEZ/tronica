@@ -1,0 +1,41 @@
+# 📁 Node.js (Frontend con Vue y Vite)
+node_modules/
+dist/
+.vite/
+.vscode/
+.env
+.env.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 📁 Python (FastAPI y Backend)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.env.*
+instance/
+db.sqlite3
+*.db
+
+# 📁 PostgreSQL
+*.sql
+*.dump
+pgdata/
+
+# 📁 Editor/IDE
+.idea/
+*.swp
+.DS_Store
+
+# 📁 Logs y Archivos Temporales
+logs/
+*.log
+*.bak
+*.tmp
+*.swp
+
+# 📁 Docker (si usas contenedores)
+docker-compose.override.yml
