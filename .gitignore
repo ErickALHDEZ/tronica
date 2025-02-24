@@ -1,14 +1,3 @@
-# 📁 Node.js (Frontend con Vue y Vite)
-node_modules/
-dist/
-.vite/
-.vscode/
-.env
-.env.local
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
 # 📁 Python (FastAPI y Backend)
 __pycache__/
 *.pyc
