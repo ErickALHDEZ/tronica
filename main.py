@@ -5,6 +5,9 @@ from fastapi import FastAPI
 #SQLAlchemy es una biblioteca de Python que proporciona herramientas SQL.
 from sqlalchemy import create_engine, text
 
+# Importamos CORSMiddleware desde starlette.middleware para habilitar CORS
+from starlette.middleware.cors import CORSMiddleware
+
 #Aquí creamos la instancia de FASTAPI.
 app = FastAPI()
 
@@ -24,6 +27,27 @@ DATABASE_URL = DATABASE_URL.replace("NOMBRE_BASE_DE_DATOS", "tronica")
 #Aquí creamos el motor de la base de datos.
 #Es un objeto que gestiona la conexión y comunicación con la base de datos.
 engine = create_engine(DATABASE_URL)
+
+# -----Configuración de CORS (Cross-Origin Resource Sharing)-----
+# CORS es un mecanismo de seguridad del navegador.
+# Por defecto, los navegadores impiden que una página web
+# (ejecutándose en un "origen" como tu index.html abierto localmente)
+# haga peticiones a un backend en un "origen" diferente
+# (como tu backend FastAPI ejecutándose en http://localhost:8000).
+# Para permitir estas peticiones "cross-origin" (entre orígenes diferentes),
+# debemos configurar CORS en el backend.
+# Agregamos el middleware CORSMiddleware a nuestra aplicación FastAPI.
+# Este middleware intercepta las peticiones y agrega las cabeceras necesarias
+# para que el navegador permita las peticiones cross-origin desde tu frontend.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  #  ["*"] permite peticiones desde CUALQUIER origen.
+                           #  En producción, DEBERÍAS especificar los orígenes exactos de tu frontend.
+                           #  Ej: ["http://tu-dominio.com", "http://otro-dominio.com"]
+    allow_credentials=True, # Permite el envío de cookies y encabezados de autorización (no siempre necesario).
+    allow_methods=["*"],     # ["*"] permite todos los métodos HTTP (GET, POST, PUT, DELETE, etc.).
+    allow_headers=["*"],     # ["*"] permite todas las cabeceras en las peticiones.
+)
 
 #Esta sección define un endpoint (una URL específica a la que tu aplicación responde).
 
