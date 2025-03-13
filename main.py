@@ -1,4 +1,7 @@
 ﻿#Solamente estoy haciendo una prueba para conectar la base de datos.
+#Pasos para correr esto:
+#Levantar el servidor con "uvicorn main:app --reload"
+#Instalar Python y luego las dependencias: "pip install fastapi uvicorn psycopg2-binary sqlalchemy"
 
 #Importamos el Framework de FASTAPI para conectar nuestro backend usando Python.
 from fastapi import FastAPI
@@ -49,7 +52,7 @@ app.add_middleware(
     allow_headers=["*"],     # ["*"] permite todas las cabeceras en las peticiones.
 )
 
-#Esta sección define un endpoint (una URL específica a la que tu aplicación responde).
+#-----Definiendo un endpoint (una URL específica a la que tu aplicación responde)s-----
 
 #Este ↓ es un "Decorador" de FASTAPI, es una etiqueta especial que indica
 #que al llegar la petición GET al url "version-db" ejecuta la función

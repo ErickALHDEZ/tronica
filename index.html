@@ -1,12 +1,39 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Versión de PostgreSQL</title>
-    </head>
-<body>
-    <h1>Versión de PostgreSQL</h1>
-    <div id="version-container"></div>
-    <script src="script.js"></script>
+    <head>
+        <meta charset="UTF-8">
+        <title>Versión de PostgreSQL terminada y prueba tabla</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        </head>
+    <body>
+        <h1>Versión de PostgreSQL</h1>
+        <div id="version-container"></div>
+        <script src="script.js"></script>
+
+        <table>
+            <!-- ↓ (Table head) Etiqueta que contiene los encabezados de las columnas --> 
+            <thead>
+
+                <!-- ↓ (Table row) Crea filas dentro del encabezado --> 
+                <tr>
+                    <!-- ↓ (Table header) Crea celdas con nombre en el encabezado --> 
+                    <th>Encabezado 1</th>
+                    <th>Encabezado 2</th>
+              </tr>
+            </thead>
+
+            <tbody>
+                <!-- ↓ (Table row) Crea filas de datos en el table body --> 
+                <tr>
+                    <!-- ↓ (Table data) Crea celdas de datos--> 
+                    <td>Dato 1</td>
+                    <td>Dato 2</td>
+                </tr>
+                <tr>
+                    <td>Dato 3</td>
+                    <td>Dato 4</td>
+                </tr>
+            </tbody>
+        </table>
     </body>
 </html>
