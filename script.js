@@ -48,4 +48,70 @@ document.addEventListener('DOMContentLoaded', function() {
           const versionContainer = document.getElementById('version-container');
           versionContainer.textContent = 'Error al conectar con el backend.';
       });
+
+    fetch('http://localhost:8000/ejercicios')
+    .then(response => response.json())
+    .then(data => {
+        const ejerciciosContainer = document.getElementById('ejercicios-container');
+        
+        if (data.ejercicios && data.ejercicios.length > 0) {
+            const html = data.ejercicios.map(ejercicio => `
+                <div class="ejercicio">
+                    <h3>${ejercicio.nombre}</h3>
+                    <p>${ejercicio.descripcion}</p>
+                </div>
+            `).join('');
+            
+            ejerciciosContainer.innerHTML = html;
+        } else if (data.error) {
+            ejerciciosContainer.textContent = 'Error: ' + data.error;
+        } else {
+            ejerciciosContainer.textContent = 'No se encontraron ejercicios';
+        }
+    })
+    .catch(error => {
+        console.error('Error al obtener ejercicios:', error);
+        const ejerciciosContainer = document.getElementById('ejercicios-container');
+        ejerciciosContainer.textContent = 'Error al cargar los ejercicios';
+    });
+
+    fetch('http://localhost:8000/categorias')
+    .then(response => response.json())
+    .then(data => {
+        const categoriasContainer = document.getElementById('categorias-container');
+        
+        if (data.categorias && data.categorias.length > 0) {
+            const html = data.categorias.map(categoria => `
+                <div class="categoria">
+                    <h3>${categoria.nombre}</h3>
+                </div>
+            `).join('');
+            
+            categoriasContainer.innerHTML = html;
+        } else if (data.error) {
+            categoriasContainer.textContent = 'Error: ' + data.error;
+        } else {
+            categoriasr.textContent = 'No se encontraron ejercicios';
+        }
+    })
+    .catch(error => {
+        console.error('Error al obtener categorias:', error);
+        const categoriasContainer = document.getElementById('categorias-container');
+        categoriasContainer.textContent = 'Error al cargar las categorias';
+    });
+
+    fetch('http://localhost:8000/ejercicios_categorias')
+    .then(response => response.json())
+    .then(data => {
+        if (data.ejercicios_categorias) {
+            // Almacenar los datos en una variable para uso posterior
+            const relaciones = data.ejercicios_categorias;
+
+        } else if (data.error) {
+            console.error('Error en relaciones:', data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error al obtener relaciones:', error);
+    });
 });

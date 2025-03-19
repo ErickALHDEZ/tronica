@@ -32,24 +32,19 @@ DATABASE_URL = DATABASE_URL.replace("NOMBRE_BASE_DE_DATOS", "tronica")
 engine = create_engine(DATABASE_URL)
 
 # -----Configuración de CORS (Cross-Origin Resource Sharing)-----
-# CORS es un mecanismo de seguridad del navegador.
-# Por defecto, los navegadores impiden que una página web
-# (ejecutándose en un "origen" como tu index.html abierto localmente)
-# haga peticiones a un backend en un "origen" diferente
-# (como tu backend FastAPI ejecutándose en http://localhost:8000).
-# Para permitir estas peticiones "cross-origin" (entre orígenes diferentes),
-# debemos configurar CORS en el backend.
-# Agregamos el middleware CORSMiddleware a nuestra aplicación FastAPI.
-# Este middleware intercepta las peticiones y agrega las cabeceras necesarias
-# para que el navegador permita las peticiones cross-origin desde tu frontend.
+#CORS es el sistema de seguridad del navegador que impide que mi página local haga peticiones a un backend de origen distinto.
+#Para permitir estas peticiones "cross-origin" dbemos configurar CORS en el backend agregando el middleware CORSMiddleware a FastApi.
+#Intercepta las peticiones y agrega los headers necesarios para que el navegador permita dichas peticiones.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  #  ["*"] permite peticiones desde CUALQUIER origen.
-                           #  En producción, DEBERÍAS especificar los orígenes exactos de tu frontend.
-                           #  Ej: ["http://tu-dominio.com", "http://otro-dominio.com"]
-    allow_credentials=True, # Permite el envío de cookies y encabezados de autorización (no siempre necesario).
-    allow_methods=["*"],     # ["*"] permite todos los métodos HTTP (GET, POST, PUT, DELETE, etc.).
-    allow_headers=["*"],     # ["*"] permite todas las cabeceras en las peticiones.
+    # ↓ ["*"] Indica que se permitan peticiones desde cualquier origen, en prod debería especificar el origen exacto por seguridad.
+    allow_origins=["*"], 
+    # ↓ Permite el envío de cookies y encabezados de autorización (no siempre necesario).
+    allow_credentials=True, 
+    # ↓ ["*"] permite todos los métodos HTTP (GET, POST, PUT, DELETE, etc.).
+    allow_methods=["*"],    
+    # ↓ ["*"] permite todos los headers en las peticiones. 
+    allow_headers=["*"],
 )
 
 #-----Definiendo un endpoint (una URL específica a la que tu aplicación responde)s-----
@@ -94,3 +89,64 @@ async def obtener_version_db():
 @app.get("/")
 async def read_root():
     return {"mensaje": "¡Backend FastAPI conectado a PostgreSQL!"}
+
+@app.get("/ejercicios")
+async def obtener_ejercicios():
+    try:
+        with engine.connect() as connection:
+            # Ejecutar consulta para obtener todos los ejercicios
+            result = connection.execute(text("SELECT * FROM public.ejercicios"))
+            
+            # Convertir resultados en lista de diccionarios
+            ejercicios = []
+            for row in result:
+                ejercicios.append({
+                    "id": row[0],
+                    "nombre": row[1],
+                    "descripcion": row[2]
+                })
+            return {"ejercicios": ejercicios}
+            
+    except Exception as e:
+        return {"error": f"Error al obtener ejercicios: {str(e)}"}
+    
+@app.get("/categorias")
+async def obtener_categorias():
+    try:
+        with engine.connect() as connection:
+            # Ejecutar consulta para obtener todos los ejercicios
+            result = connection.execute(text("SELECT * FROM public.categorias"))
+            
+            # Convertir resultados en lista de diccionarios
+            categorias = []
+            for row in result:
+                categorias.append({
+                    "id": row[0],
+                    "nombre": row[1],
+                })
+            return {"categorias": categorias}
+            
+    except Exception as e:
+        return {"error": f"Error al obtener categorias: {str(e)}"}
+    
+@app.get("/ejercicios_categorias")
+async def obtener_ejercicios_categorias():
+    try:
+        with engine.connect() as connection:
+            result = connection.execute(text("SELECT * FROM public.ejercicios_categorias"))
+            
+            # Convertir resultados en lista de diccionarios
+            ejercicios_categorias = []
+            for row in result:
+                ejercicios_categorias.append({
+                    "ejercicio_id": row[0],
+                    "categoria_id": row[1],
+                })
+            return {"ejercicios_categorias": ejercicios_categorias}
+            
+    except Exception as e:
+        return {"error": f"Error al obtener la relación entre ejercicio y categorias: {str(e)}"}
+
+#FASTAPI GENERA DOCUMENTACIÓN EN AUTOMATICO OMGGGGG
+#http://localhost:8000/docs
+#http://localhost:8000/redoc
