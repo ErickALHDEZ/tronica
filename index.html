@@ -2,41 +2,26 @@
 <html lang="es">
     <head>
         <meta charset="UTF-8">
-        <title>Versión de PostgreSQL terminada y prueba tabla</title>
+        <title>Ejercicios por Categoría</title>
         <link rel="stylesheet" type="text/css" href="style.css">
-        </head>
+    </head>
     <body>
-        <h1>Versión de PostgreSQL</h1>
-        <!-- ↓ Le otorga nombre e id al elemento que el .js buscará en la línea 28 del script --> 
-        <div id="version-container"></div>
-        <div id="ejercicios-container"></div>
-        <div id="categorias-container"></div>
+        <h1>Ejercicios por Categoría</h1>
+        <div id="filtros-container" class="filtros"></div>
+        
+        <div id="tabla-container">
+            <table id="tabla-ejercicios">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Categorías</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpo-tabla"></tbody>
+            </table>
+        </div>
+
         <script src="script.js"></script>
-
-        <table>
-            <!-- ↓ (Table head) Etiqueta que contiene los encabezados de las columnas --> 
-            <thead>
-
-                <!-- ↓ (Table row) Crea filas dentro del encabezado --> 
-                <tr>
-                    <!-- ↓ (Table header) Crea celdas con nombre en el encabezado --> 
-                    <th>Encabezado 1</th>
-                    <th>Encabezado 2</th>
-              </tr>
-            </thead>
-
-            <tbody>
-                <!-- ↓ (Table row) Crea filas de datos en el table body --> 
-                <tr>
-                    <!-- ↓ (Table data) Crea celdas de datos--> 
-                    <td>Dato 1</td>
-                    <td>Dato 2</td>
-                </tr>
-                <tr>
-                    <td>Dato 3</td>
-                    <td>Dato 4</td>
-                </tr>
-            </tbody>
-        </table>
     </body>
 </html>

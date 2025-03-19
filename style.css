@@ -1,5 +1,29 @@
-table, th, td {
-  border: 1px solid black;
+.filtros button {
+  margin: 5px;
+  padding: 8px 15px;
+  cursor: pointer;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+
+.filtros button:hover {
+  background-color: #45a049;
+}
+
+#tabla-ejercicios {
+  width: 100%;
   border-collapse: collapse;
-  padding: 8px;
+  margin-top: 20px;
+}
+
+#tabla-ejercicios th, #tabla-ejercicios td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+#tabla-ejercicios th {
+  background-color: #f2f2f2;
 }
