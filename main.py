@@ -1,7 +1,7 @@
 ﻿#Solamente estoy haciendo una prueba para conectar la base de datos.
 #Pasos para correr esto:
-#Levantar el servidor con "uvicorn main:app --reload"
 #Instalar Python y luego las dependencias: "pip install fastapi uvicorn psycopg2-binary sqlalchemy"
+#Levantar el servidor con "uvicorn main:app --reload"
 
 #Importamos el Framework de FASTAPI para conectar nuestro backend usando Python.
 from fastapi import FastAPI

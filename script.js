@@ -1,15 +1,30 @@
+//Espera a que la página se cargue por completo antes de ejecutar un script.
+//Con el objetivo de encontrar y manipular correctamente elementos HTML.
+//Esto engloba todo el código dentro del script.
+//Document es el objeto que representa la página web cargada en el navegador.
+//addEventListener es un método que hace lo que su nombre sugiere, lo agregamos al objeto.
+//DOMContentLoaded indica qué tipo de evento se está escuchando, a que cargue el DOM.
+//↓ DOM == La forma en como Js accede al contenido HTML de la página, Document Object Model.
 document.addEventListener('DOMContentLoaded', function() {
+    //ejerciciosData solamente es un array, al igual que relacionesData.
     let ejerciciosData = [];
+    //Categorías es un hash map o diccionario donde básicamente es una lista indexada.
     let categoriasMap = new Map();
     let relacionesData = [];
 
-    // Obtener todos los datos necesarios
+    //En JS una promesa es un objeto que representa el eventual resultado de una operación asíncrona, o sea en paralelo y su valor resultante.
+    //↓ .all indica que esta promesa se resolverá solo cuando todas las promesas del array sean resueltas.
     Promise.all([
+        //fetch == Función que realiza solicitud de red.
+        //↓ En este caso lo hace al backend en mi main.py para obtener todos los datos necesarios
         fetch('http://localhost:8000/ejercicios').then(r => r.json()),
         fetch('http://localhost:8000/categorias').then(r => r.json()),
         fetch('http://localhost:8000/ejercicios_categorias').then(r => r.json())
     ])
-    .then(([ejerciciosRes, categoriasRes, relacionesRes]) => {
+    //.Then (después de) se ejecuta todo lo que está dentro de paréntesis una vez se resuelva el Promise.all.
+    //Promise.all ha devuelto un array donde se almacenan los resultados de los 3 fetch,
+    //entonces mediante array destructuring, añadimos dichos resultados a las variables dentro del paréntesis.
+    .then(([ejerciciosResultados, categoriasResultados, relacionesResultados]) => {
         ejerciciosData = ejerciciosRes.ejercicios || [];
         relacionesData = relacionesRes.ejercicios_categorias || [];
         
