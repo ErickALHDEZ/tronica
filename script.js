@@ -67,6 +67,9 @@ document.addEventListener('DOMContentLoaded', function() {
     el valor dentro del array anterior de respuestas del fetch.
     */
     .then(([ejerciciosResultados, categoriasResultados, relacionesResultados]) => {
+        console.log("Resultados ejercicios:", ejerciciosResultados);
+        console.log("Resultados categorias:", categoriasResultados);
+        console.log("Resultados relaciones:", relacionesResultados);
         /*
         ejerciciosData fue el objeto definido en la línea 16.
         Aquí le estamos diciendo que nuestro objeto su nuevo valor será
@@ -87,9 +90,11 @@ document.addEventListener('DOMContentLoaded', function() {
         //En este caso por cada una de las categorias que trajo el fecth.
         (categoriasResultados.categorias || []).forEach(categoriaIndividual => {
             //categoriasMap.set lo que hace es que configura el objeto Map asignando la relación par entre el contenido del ID y el nombre, logrando que el mapa esté indexado
+            //Formato: map.set(clave, valor))
             categoriasMap.set(categoriaIndividual.id, categoriaIndividual.nombre);
         });
 
+        //Llamamos a la función enviando nuestras categorias como argumentos.
         generarBotonesFiltro(categoriasResultados.categorias);
         actualizarTabla();
     })
@@ -97,53 +102,123 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Error al cargar datos:', error);
     });
 
+    //Declaramos la función usando las categorias como parámetros
     function generarBotonesFiltro(categorias) {
+        //Declarado en la línea 10 de nuestro HTML
         const contenedor = document.getElementById('filtros-container');
         
-        // Botón "Todos"
+        //Creo el botón "Todos"
         const botonTodos = document.createElement('button');
         botonTodos.textContent = 'Todos';
         botonTodos.addEventListener('click', () => actualizarTabla());
+        //Agrega el botón "Todos" al contenedor de filtros en el HTML.
         contenedor.appendChild(botonTodos);
 
-        // Botones por categoría
+        //El .forEach itera a través de cada objeto categoria en el array categorias.
         categorias.forEach(categoria => {
-            const boton = document.createElement('button');
-            boton.textContent = categoria.nombre;
-            boton.dataset.categoriaId = categoria.id;
-            boton.addEventListener('click', () => filtrarPorCategoria(categoria.id));
-            contenedor.appendChild(boton);
+            const botonCategorias = document.createElement('button');
+            botonCategorias.textContent = categoria.nombre;
+            //Recordemos que categoria es el parámetro.
+            //boton.dataset.categoriaId: Esto accede a la propiedad categoriaId del objeto dataset del botón.
+            //Cuando utilizas boton.dataset.categoriaId = categoria.id;, si el atributo data-categoriaId no existe, JavaScript lo crea dinámicamente.
+            botonCategorias.dataset.categoriaId = categoria.id;
+            botonCategorias.addEventListener('click', () => filtrarPorCategoria(categoria.id));
+            contenedor.appendChild(botonCategorias);
         });
     }
 
+    //Correspondiente al EventListener de los botones creados.
     function filtrarPorCategoria(categoriaId) {
+        //Declaramos lo que será enviado a la función actualizarTabla
+
+        /*
+        .filter crea un nuevo array que contiene solo los elementos de ejerciciosData que cumplen con una condición dada.
+        const words = ["spray", "elite", "exuberant", "destruction", "present"];
+
+        const result = words.filter((word) => word.length > 6);
+
+        console.log(result);
+        // Expected output: Array ["exuberant", "destruction", "present"]
+        */
+
+        /*
+        ¿por qué const y no var? 
+        const evita que reasignemos la variable ejerciciosFiltrados a un nuevo array.
+        Pero el contenido del array al que apunta ejerciciosFiltrados (es decir, los elementos dentro del array) cambia cada vez que se filtra.
+
+        Imagina que ejerciciosFiltrados es una etiqueta que pegas en una caja.
+
+        const asegura que la etiqueta siempre esté pegada a la misma caja.
+        Pero el contenido de la caja (los ejercicios filtrados) puede cambiar cada vez que pulsas un botón.
+        */
         const ejerciciosFiltrados = ejerciciosData.filter(ejercicio => {
-            return relacionesData.some(rel => 
-                rel.ejercicio_id === ejercicio.id && 
-                rel.categoria_id === categoriaId
+            //Utiliza el método some en el array relacionesData. some devuelve true si al menos un elemento en relacionesData cumple con la condición dada.
+            //En cada llamada a esta función de flecha, la variable "relacion" toma el valor del elemento actual del array relacionesData.
+            return relacionesData.some(relacion => 
+                /*
+                La condición que se debe cumplir es: 
+
+                1.- relacion.ejercicio_id === ejercicio.id: 
+                El ID del ejercicio en la relación (sobre el que se itera actualmente en relacionesData) debe ser igual 
+                al ID del ejercicio actual que está siendo filtrado, siendo este la iteración de uno de todos los que están en ejerciciosDatas.
+
+                2.- relacion.categoria_id === categoriaId: 
+                El ID de la categoría en la relación (sobre el que se itera actualmente en relacionesData) debe ser igual 
+                al ID de la categoría que se está utilizando para el filtro (y se recibió como argumento)
+
+                Ambas condiciones deben ser true (verdaderas) debido al operador && (AND lógico).
+                */
+                relacion.ejercicio_id === ejercicio.id && 
+                relacion.categoria_id === categoriaId
             );
         });
+        //Se llama a la función y se envía como argumento el array ejerciciosFiltrados resultante de ambos bucles filtrados, que así mismo fue declarado como const anteriormente.
         actualizarTabla(ejerciciosFiltrados);
     }
-
+    
+    //Si la función no recibe (ejerciciosFiltrados) entonces por default su argumento será ejerciciosData.
     function actualizarTabla(ejercicios = ejerciciosData) {
+    
+        //Obtiene una referencia al elemento HTML con el ID 'cuerpo-tabla' donde se insertarán las filas de datos.
         const tbody = document.getElementById('cuerpo-tabla');
+    
+        // Borra todo el contenido HTML dentro del elemento 'tbody'.
+        // Esto asegura que la tabla se actualice con los nuevos datos y no se dupliquen las filas anteriores.
         tbody.innerHTML = '';
-
+        
+        // Itera sobre cada elemento dentro del array 'ejercicios'.
         ejercicios.forEach(ejercicio => {
-            const categoriasEjercicio = relacionesData
-                .filter(rel => rel.ejercicio_id === ejercicio.id)
-                .map(rel => categoriasMap.get(rel.categoria_id))
-                .join(', ');
+        
+            //Filtra el array 'relacionesData' uno por uno.
+            //Para cada 'relacion' en 'relacionesData', se verifica si el valor de la propiedad 'ejercicio_id' coincide con el 'id' del 'ejercicio'sobre el cual iteramos actualmente.
+            //Esto devuelve un nuevo array que contiene solo las relaciones correspondientes al ejercicio actual.
+          const categoriasEjercicio = relacionesData.filter(relacion => relacion.ejercicio_id === ejercicio.id)
 
-            const fila = `
-                <tr>
-                    <td>${ejercicio.nombre}</td>
-                    <td>${ejercicio.descripcion}</td>
-                    <td>${categoriasEjercicio}</td>
-                </tr>
+            //Mapeamos el array de relaciones filtrado
+            //Para cada 'relacion', se extrae el valor de la propiedad 'categoria_id'.
+            //Luego, se utiliza este 'categoria_id' como clave para buscar el nombre de la categoría en el objeto Map llamado 'categoriasMap'.
+            //Esto devuelve un nuevo array que contiene los nombres de las categorías asociadas al ejercicio actual.
+            .map(relacion => categoriasMap.get(relacion.categoria_id))
+        
+            // Une los elementos del array de nombres de categorías en una única cadena de texto.
+            // Los nombres de las categorías se separan por una coma y un espacio (', ').
+            .join(', ');
+        
+          // Crea una plantilla de cadena de texto (template literal) que representa una fila de tabla ('<tr>').
+          // Dentro de la fila, se definen tres celdas de tabla ('<td>'):
+          //   - La primera celda contiene el valor de la propiedad 'nombre' del objeto 'ejercicio'.
+          //   - La segunda celda contiene el valor de la propiedad 'descripcion' del objeto 'ejercicio'.
+          //   - La tercera celda contiene la cadena de texto 'categoriasEjercicio' que representa las categorías del ejercicio.
+          const fila = `
+              <tr>
+                <td>${ejercicio.nombre}</td>
+                <td>${ejercicio.descripcion}</td>
+                <td>${categoriasEjercicio}</td>
+              </tr>
             `;
-            tbody.innerHTML += fila;
+          // Agrega la cadena HTML de la 'fila' al contenido HTML existente del elemento 'tbody'.
+          // Esto inserta una nueva fila en la tabla con los datos del ejercicio actual.
+          tbody.innerHTML += fila;
         });
-    }
+      }
 });
