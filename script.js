@@ -81,9 +81,13 @@ document.addEventListener('DOMContentLoaded', function() {
         ejerciciosData = ejerciciosResultados.ejercicios || [];
         relacionesData = relacionesResultados.ejercicios_categorias || [];
         
+        //Diferencia entre un Map y un Hash Map en Javascript: https://x.com/erick_dev111/status/1903652712488595883
         // Crear mapa de categorías
-        (categoriasResultados.categorias || []).forEach(cat => {
-            categoriasMap.set(cat.id, cat.nombre);
+        //.forEach() es un método de array que ejecuta una función para cada elemento del array.
+        //En este caso por cada una de las categorias que trajo el fecth.
+        (categoriasResultados.categorias || []).forEach(categoriaIndividual => {
+            //categoriasMap.set lo que hace es que configura el objeto Map asignando la relación par entre el contenido del ID y el nombre, logrando que el mapa esté indexado
+            categoriasMap.set(categoriaIndividual.id, categoriaIndividual.nombre);
         });
 
         generarBotonesFiltro(categoriasResultados.categorias);

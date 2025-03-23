@@ -114,7 +114,7 @@ async def obtener_ejercicios():
 async def obtener_categorias():
     try:
         with engine.connect() as connection:
-            # Ejecutar consulta para obtener todos los ejercicios
+            # Ejecutar consulta para obtener todas las categorias
             result = connection.execute(text("SELECT * FROM public.categorias"))
             
             # Convertir resultados en lista de diccionarios
@@ -133,6 +133,7 @@ async def obtener_categorias():
 async def obtener_ejercicios_categorias():
     try:
         with engine.connect() as connection:
+            # Ejecutar consulta para obtener todas las categorias
             result = connection.execute(text("SELECT * FROM public.ejercicios_categorias"))
             
             # Convertir resultados en lista de diccionarios
