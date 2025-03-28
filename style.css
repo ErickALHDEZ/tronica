@@ -14,7 +14,7 @@
 
 #tabla-ejercicios {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: collapse; /* Cambiado para mejor manejo de filas ocultas */
   margin-top: 20px;
 }
 
@@ -22,8 +22,50 @@
   border: 1px solid #ddd;
   padding: 12px;
   text-align: left;
+  vertical-align: top; /* Alinea el contenido al tope */
 }
 
 #tabla-ejercicios th {
   background-color: #f2f2f2;
+}
+
+/* Estilos para el botón de expandir/contraer */
+.expand-button {
+    padding: 5px 10px;
+    cursor: pointer;
+    background-color: #7694bc; /* Verde */
+    color: white;
+    border: none;
+    border-radius: 3px;
+}
+
+.expand-button:hover {
+    background-color: #92aac9;
+}
+
+/* Fila de detalles inicialmente oculta */
+.details-row {
+  display: none; /* Oculta por defecto */
+  background-color: #f9f9f9; /* Un fondo ligero para distinguirla */
+}
+
+/* Celda que contiene los detalles */
+.details-cell {
+    padding: 15px; /* Más padding para el contenido desplegado */
+    border: 1px dashed #ccc; /* Un borde diferente */
+}
+
+.details-cell h4 { /* Estilo para los títulos dentro del desplegable */
+    margin-top: 0;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+/* Estilo para la imagen de ejemplo */
+.visual-example-img {
+    max-width: 200px; /* Limita el ancho de la imagen */
+    max-height: 200px; /* Limita la altura */
+    display: block; /* Asegura que ocupe su propio espacio */
+    margin-top: 10px; /* Espacio sobre la imagen */
+    border: 1px solid #eee; /* Borde sutil */
 }

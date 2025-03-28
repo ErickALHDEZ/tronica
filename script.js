@@ -83,30 +83,40 @@ document.addEventListener('DOMContentLoaded', function() {
         */
         ejerciciosData = ejerciciosResultados.ejercicios || [];
         relacionesData = relacionesResultados.ejercicios_categorias || [];
-        
+
         //Diferencia entre un Map y un Hash Map en Javascript: https://x.com/erick_dev111/status/1903652712488595883
         // Crear mapa de categorías
         //.forEach() es un método de array que ejecuta una función para cada elemento del array.
         //En este caso por cada una de las categorias que trajo el fecth.
         (categoriasResultados.categorias || []).forEach(categoriaIndividual => {
-            //categoriasMap.set lo que hace es que configura el objeto Map asignando la relación par entre el contenido del ID y el nombre, logrando que el mapa esté indexado
-            //Formato: map.set(clave, valor))
-            categoriasMap.set(categoriaIndividual.id, categoriaIndividual.nombre);
+             if (categoriaIndividual && typeof categoriaIndividual.id !== 'undefined') { // Añadida validación
+                //categoriasMap.set lo que hace es que configura el objeto Map asignando la relación par entre el contenido del ID y el nombre, logrando que el mapa esté indexado
+                //Formato: map.set(clave, valor))
+                categoriasMap.set(categoriaIndividual.id, categoriaIndividual.nombre);
+            }
         });
 
         //Llamamos a la función enviando nuestras categorias como argumentos.
-        generarBotonesFiltro(categoriasResultados.categorias);
+        generarBotonesFiltro(categoriasResultados.categorias || []); // Añadido fallback
         actualizarTabla();
+        agregarListenerExpandir(); // <<< NUEVO: Añade el listener para los botones
     })
     .catch(error => {
         console.error('Error al cargar datos:', error);
+        // <<< NUEVO: Mostrar error en la tabla si falla la carga inicial
+        const tbody = document.getElementById('cuerpo-tabla');
+        if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="3" style="color: red; text-align: center;">Error al cargar los datos iniciales.</td></tr>`;
+        }
     });
 
     //Declaramos la función usando las categorias como parámetros
     function generarBotonesFiltro(categorias) {
         //Declarado en la línea 10 de nuestro HTML
         const contenedor = document.getElementById('filtros-container');
-        
+         if (!contenedor) return; // <<< NUEVO: Salir si no se encuentra el contenedor
+         contenedor.innerHTML = ''; // <<< NUEVO: Limpiar botones existentes por si se llama de nuevo
+
         //Creo el botón "Todos"
         const botonTodos = document.createElement('button');
         botonTodos.textContent = 'Todos';
@@ -115,16 +125,26 @@ document.addEventListener('DOMContentLoaded', function() {
         contenedor.appendChild(botonTodos);
 
         //El .forEach itera a través de cada objeto categoria en el array categorias.
-        categorias.forEach(categoria => {
-            const botonCategorias = document.createElement('button');
-            botonCategorias.textContent = categoria.nombre;
-            //Recordemos que categoria es el parámetro.
-            //boton.dataset.categoriaId: Esto accede a la propiedad categoriaId del objeto dataset del botón.
-            //Cuando utilizas boton.dataset.categoriaId = categoria.id;, si el atributo data-categoriaId no existe, JavaScript lo crea dinámicamente.
-            botonCategorias.dataset.categoriaId = categoria.id;
-            botonCategorias.addEventListener('click', () => filtrarPorCategoria(categoria.id));
-            contenedor.appendChild(botonCategorias);
-        });
+         // <<< NUEVO: Verificar que 'categorias' sea un array antes de usar forEach
+        if (Array.isArray(categorias)) {
+            categorias.forEach(categoria => {
+                 // <<< NUEVO: Comprobar que 'categoria' y sus propiedades necesarias existan
+                 if (categoria && typeof categoria.id !== 'undefined' && typeof categoria.nombre !== 'undefined') {
+                    const botonCategorias = document.createElement('button');
+                    botonCategorias.textContent = categoria.nombre;
+                    //Recordemos que categoria es el parámetro.
+                    //boton.dataset.categoriaId: Esto accede a la propiedad categoriaId del objeto dataset del botón.
+                    //Cuando utilizas boton.dataset.categoriaId = categoria.id;, si el atributo data-categoriaId no existe, JavaScript lo crea dinámicamente.
+                    botonCategorias.dataset.categoriaId = categoria.id; // Usar dataset es más estándar
+                    botonCategorias.addEventListener('click', () => filtrarPorCategoria(categoria.id));
+                    contenedor.appendChild(botonCategorias);
+                } else {
+                     console.warn("Elemento de categoría inválido encontrado:", categoria); // <<< NUEVO: Advertencia si hay datos inválidos
+                }
+            });
+        } else {
+             console.error("'categorias' recibidas en generarBotonesFiltro no es un array:", categorias); // <<< NUEVO: Error si no es array
+        }
     }
 
     //Correspondiente al EventListener de los botones creados.
@@ -142,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
         */
 
         /*
-        ¿por qué const y no var? 
+        ¿por qué const y no var?
         const evita que reasignemos la variable ejerciciosFiltrados a un nuevo array.
         Pero el contenido del array al que apunta ejerciciosFiltrados (es decir, los elementos dentro del array) cambia cada vez que se filtra.
 
@@ -154,71 +174,156 @@ document.addEventListener('DOMContentLoaded', function() {
         const ejerciciosFiltrados = ejerciciosData.filter(ejercicio => {
             //Utiliza el método some en el array relacionesData. some devuelve true si al menos un elemento en relacionesData cumple con la condición dada.
             //En cada llamada a esta función de flecha, la variable "relacion" toma el valor del elemento actual del array relacionesData.
-            return relacionesData.some(relacion => 
+            return relacionesData.some(relacion =>
                 /*
-                La condición que se debe cumplir es: 
+                La condición que se debe cumplir es:
 
-                1.- relacion.ejercicio_id === ejercicio.id: 
-                El ID del ejercicio en la relación (sobre el que se itera actualmente en relacionesData) debe ser igual 
+                1.- relacion.ejercicio_id === ejercicio.id:
+                El ID del ejercicio en la relación (sobre el que se itera actualmente en relacionesData) debe ser igual
                 al ID del ejercicio actual que está siendo filtrado, siendo este la iteración de uno de todos los que están en ejerciciosDatas.
 
-                2.- relacion.categoria_id === categoriaId: 
-                El ID de la categoría en la relación (sobre el que se itera actualmente en relacionesData) debe ser igual 
+                2.- relacion.categoria_id === categoriaId:
+                El ID de la categoría en la relación (sobre el que se itera actualmente en relacionesData) debe ser igual
                 al ID de la categoría que se está utilizando para el filtro (y se recibió como argumento)
 
                 Ambas condiciones deben ser true (verdaderas) debido al operador && (AND lógico).
                 */
-                relacion.ejercicio_id === ejercicio.id && 
+                relacion.ejercicio_id === ejercicio.id &&
                 relacion.categoria_id === categoriaId
             );
         });
         //Se llama a la función y se envía como argumento el array ejerciciosFiltrados resultante de ambos bucles filtrados, que así mismo fue declarado como const anteriormente.
         actualizarTabla(ejerciciosFiltrados);
     }
-    
+
     //Si la función no recibe (ejerciciosFiltrados) entonces por default su argumento será ejerciciosData.
     function actualizarTabla(ejercicios = ejerciciosData) {
-    
+
         //Obtiene una referencia al elemento HTML con el ID 'cuerpo-tabla' donde se insertarán las filas de datos.
         const tbody = document.getElementById('cuerpo-tabla');
-    
+         if (!tbody) return; // <<< NUEVO: Salir si no existe el tbody
+
         // Borra todo el contenido HTML dentro del elemento 'tbody'.
         // Esto asegura que la tabla se actualice con los nuevos datos y no se dupliquen las filas anteriores.
         tbody.innerHTML = '';
-        
+
+         // <<< NUEVO: Verificar que 'ejercicios' sea un array
+        if (!Array.isArray(ejercicios)) {
+            console.error("'ejercicios' recibidos en actualizarTabla no es un array:", ejercicios);
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">Error interno al mostrar ejercicios.</td></tr>';
+            return;
+        }
+
+         // <<< NUEVO: Mensaje si no hay ejercicios
+         if (ejercicios.length === 0) {
+             // Diferenciar si es por filtro o porque no hay datos iniciales
+             if (ejercicios !== ejerciciosData) { // Si 'ejercicios' no es el array original, es porque se filtró
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">No hay ejercicios que coincidan con el filtro.</td></tr>';
+             } else {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">No hay ejercicios para mostrar.</td></tr>';
+             }
+            return;
+        }
+
+
         // Itera sobre cada elemento dentro del array 'ejercicios'.
         ejercicios.forEach(ejercicio => {
-        
+             // <<< NUEVO: Comprobar validez del objeto ejercicio
+             if (!ejercicio || typeof ejercicio.id === 'undefined') {
+                 console.warn("Elemento de ejercicio inválido encontrado en actualizarTabla:", ejercicio);
+                 return; // Saltar este ejercicio si es inválido
+            }
+
             //Filtra el array 'relacionesData' uno por uno.
             //Para cada 'relacion' en 'relacionesData', se verifica si el valor de la propiedad 'ejercicio_id' coincide con el 'id' del 'ejercicio'sobre el cual iteramos actualmente.
             //Esto devuelve un nuevo array que contiene solo las relaciones correspondientes al ejercicio actual.
-          const categoriasEjercicio = relacionesData.filter(relacion => relacion.ejercicio_id === ejercicio.id)
+            const categoriasRelaciones = relacionesData.filter(relacion => relacion.ejercicio_id === ejercicio.id);
 
             //Mapeamos el array de relaciones filtrado
             //Para cada 'relacion', se extrae el valor de la propiedad 'categoria_id'.
             //Luego, se utiliza este 'categoria_id' como clave para buscar el nombre de la categoría en el objeto Map llamado 'categoriasMap'.
             //Esto devuelve un nuevo array que contiene los nombres de las categorías asociadas al ejercicio actual.
-            .map(relacion => categoriasMap.get(relacion.categoria_id))
-        
+            const nombresCategorias = categoriasRelaciones.map(relacion => categoriasMap.get(relacion.categoria_id) || 'Desconocida'); // <<< NUEVO: Fallback por si no encuentra el ID
+
             // Une los elementos del array de nombres de categorías en una única cadena de texto.
             // Los nombres de las categorías se separan por una coma y un espacio (', ').
-            .join(', ');
-        
-          // Crea una plantilla de cadena de texto (template literal) que representa una fila de tabla ('<tr>').
-          // Dentro de la fila, se definen tres celdas de tabla ('<td>'):
-          //   - La primera celda contiene el valor de la propiedad 'nombre' del objeto 'ejercicio'.
-          //   - La segunda celda contiene el valor de la propiedad 'descripcion' del objeto 'ejercicio'.
-          //   - La tercera celda contiene la cadena de texto 'categoriasEjercicio' que representa las categorías del ejercicio.
-          const fila = `
-              <tr>
-                <td>${ejercicio.nombre}</td>
-                <td>${ejercicio.descripcion}</td>
-                <td>${categoriasEjercicio}</td>
-              </tr>
+            const categoriasTexto = nombresCategorias.join(', ');
+
+             // --- <<< INICIO BLOQUE MODIFICADO: Crear filas con DOM en lugar de innerHTML += fila >>> ---
+             // Crea una plantilla de cadena de texto (template literal) que representa una fila de tabla ('<tr>').
+             // Dentro de la fila, se definen tres celdas de tabla ('<td>'):
+             //   - La primera celda contiene el valor de la propiedad 'nombre' del objeto 'ejercicio'.
+             //   - La segunda celda contiene la cadena de texto 'categoriasTexto' que representa las categorías del ejercicio.
+             //   - La tercera celda contiene el botón "Expandir".
+
+             // --- Fila Principal ---
+            const filaPrincipal = document.createElement('tr');
+            filaPrincipal.innerHTML = `
+                <td>${ejercicio.nombre || 'Sin nombre'}</td>
+                <td>${categoriasTexto || 'Sin categorías'}</td>
+                <td>
+                    <button class="expand-button" data-target-id="details-${ejercicio.id}">
+                        Expandir
+                    </button>
+                </td>
             `;
-          // Agrega la cadena HTML de la 'fila' al contenido HTML existente del elemento 'tbody'.
-          // Esto inserta una nueva fila en la tabla con los datos del ejercicio actual.
-          tbody.innerHTML += fila;
+
+            // --- Fila de Detalles (oculta) ---
+            const filaDetalles = document.createElement('tr');
+            filaDetalles.id = `details-${ejercicio.id}`;
+            filaDetalles.classList.add('details-row'); // Clase CSS para ocultar/mostrar y estilizar
+            // El colspan debe ser igual al número de columnas VISIBLES en la fila principal (3 en este caso: Nombre, Categorías, Acción)
+            filaDetalles.innerHTML = `
+                <td colspan="3" class="details-cell">
+                    <h4>Descripción:</h4>
+                    <p>${ejercicio.descripcion || 'No disponible.'}</p>
+                    <h4>Ejemplo visual:</h4>
+                    <img src="${ejercicio.imagenUrl || 'placeholder.png'}"
+                         alt="Ejemplo visual de ${ejercicio.nombre || 'ejercicio'}"
+                         class="visual-example-img"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" >
+                     <span style="display:none; color: #888;">(Imagen no disponible)</span>
+                </td>
+            `;
+
+            // Agrega la cadena HTML de la 'fila' al contenido HTML existente del elemento 'tbody'.
+             // Esto inserta una nueva fila en la tabla con los datos del ejercicio actual.
+             // <<< FIN BLOQUE MODIFICADO >>>
+            tbody.appendChild(filaPrincipal);
+            tbody.appendChild(filaDetalles);
         });
+      }
+
+      // --- <<< NUEVA FUNCION: para manejar los clics en los botones Expandir/Contraer >>> ---
+      function agregarListenerExpandir() {
+          const tbody = document.getElementById('cuerpo-tabla');
+          if (!tbody) return; // Salir si no existe tbody
+
+          // Usar delegación de eventos para eficiencia
+          tbody.addEventListener('click', function(event) {
+              // Verificar si el elemento clickeado es un botón con la clase 'expand-button'
+              if (event.target.classList.contains('expand-button')) {
+                  const button = event.target;
+                  const targetId = button.dataset.targetId; // Obtener el ID de la fila de detalles desde data-target-id
+                  const detailsRow = document.getElementById(targetId); // Encontrar la fila de detalles
+
+                  if (detailsRow) {
+                      // Comprobar el estado actual de visibilidad (usando el estilo inline)
+                      const isVisible = detailsRow.style.display === 'table-row'; // 'table-row' fue como lo mostramos
+
+                      if (isVisible) {
+                          // Si está visible: ocultarla y cambiar texto del botón
+                          detailsRow.style.display = 'none';
+                          button.textContent = 'Expandir';
+                      } else {
+                          // Si está oculta: mostrarla y cambiar texto del botón
+                          detailsRow.style.display = 'table-row'; // Mostrar como fila de tabla para que ocupe el espacio correctamente
+                          button.textContent = 'Contraer';
+                      }
+                  } else {
+                      console.warn("No se encontró la fila de detalles con ID:", targetId); // Advertencia si no se encuentra la fila
+                  }
+              }
+          });
       }
 });
