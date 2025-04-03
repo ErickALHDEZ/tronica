@@ -67,9 +67,6 @@ document.addEventListener('DOMContentLoaded', function() {
     el valor dentro del array anterior de respuestas del fetch.
     */
     .then(([ejerciciosResultados, categoriasResultados, relacionesResultados]) => {
-        console.log("Resultados ejercicios:", ejerciciosResultados);
-        console.log("Resultados categorias:", categoriasResultados);
-        console.log("Resultados relaciones:", relacionesResultados);
         /*
         ejerciciosData fue el objeto definido en la línea 16.
         Aquí le estamos diciendo que nuestro objeto su nuevo valor será
@@ -110,9 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    //Declaramos la función usando las categorias como parámetros
     function generarBotonesFiltro(categorias) {
-        //Declarado en la línea 10 de nuestro HTML
         const contenedor = document.getElementById('filtros-container');
          if (!contenedor) return; // <<< NUEVO: Salir si no se encuentra el contenedor
          contenedor.innerHTML = ''; // <<< NUEVO: Limpiar botones existentes por si se llama de nuevo
@@ -121,7 +116,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const botonTodos = document.createElement('button');
         botonTodos.textContent = 'Todos';
         botonTodos.addEventListener('click', () => actualizarTabla());
-        //Agrega el botón "Todos" al contenedor de filtros en el HTML.
         contenedor.appendChild(botonTodos);
 
         //El .forEach itera a través de cada objeto categoria en el array categorias.
@@ -147,7 +141,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    //Correspondiente al EventListener de los botones creados.
     function filtrarPorCategoria(categoriaId) {
         //Declaramos lo que será enviado a la función actualizarTabla
 
@@ -192,7 +185,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 relacion.categoria_id === categoriaId
             );
         });
-        //Se llama a la función y se envía como argumento el array ejerciciosFiltrados resultante de ambos bucles filtrados, que así mismo fue declarado como const anteriormente.
         actualizarTabla(ejerciciosFiltrados);
     }
 
