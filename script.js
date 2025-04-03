@@ -8,17 +8,18 @@ DOMContentLoaded indica qué tipo de evento se está escuchando, a que cargue el
 ↓ DOM == La forma en como Js accede al contenido HTML de la página, Document Object Model.
 */
 document.addEventListener('DOMContentLoaded', function() {
-    //ejerciciosData solamente es un array, al igual que relacionesData.
-    //let es una de las tres formas de declarar variables en js.
-    //Indica que tiene alcance de bloque, solo es accesible dentro de las llaves {} donde se define, en este caso el EventListener.
-    //Esta puede ser reasignada y cambiar a lo largo del programa, de la misma manera que un var.
-    //Categorías es un hash map o diccionario donde básicamente es una lista indexada.
+    /*
+    ejerciciosData solamente es un array, al igual que relacionesData.
+    let es una de las tres formas de declarar variables en js.
+    Indica que tiene alcance de bloque, solo es accesible dentro de las llaves {} donde se define, en este caso el EventListener.
+    Esta puede ser reasignada y cambiar a lo largo del programa, de la misma manera que un var.
+    Categorías es un hash map o diccionario donde básicamente es una lista indexada. */
     let ejerciciosData = [];
     let categoriasMap = new Map();
     let relacionesData = [];
-
-    //En JS una promesa es un objeto que representa el eventual resultado de una operación asíncrona, o sea en paralelo y su valor resultante.
-    //↓ .all indica que esta promesa se resolverá solo cuando todas las promesas del array sean resueltas.
+    /*
+    En JS una promesa es un objeto que representa el eventual resultado de una operación asíncrona, o sea en paralelo y su valor resultante.
+    ↓ .all indica que esta promesa se resolverá solo cuando todas las promesas del array sean resueltas. */
     Promise.all([
         /*
         fetch == Función que realiza solicitud de red, esta devuelve una promesa, la cual .then() espera para ejecutar el resto del código.
@@ -47,7 +48,8 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('http://localhost:8000/categorias').then(r => r.json()),
         fetch('http://localhost:8000/ejercicios_categorias').then(r => r.json())
     ])
-    /*
+    //#region
+    /* 
     .Then (después de) se ejecuta todo lo que está dentro de paréntesis una vez se resuelva el Promise.all.
     Promise.all ha devuelto un array donde se almacenan los resultados de los 3 fetch,
     Si te das cuenta, en la línea 17 abrimos el array y lo cerramos en la 42.
@@ -65,8 +67,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     Básicamente estoy abriendo un array con tres variables y a cada una le asigno
     el valor dentro del array anterior de respuestas del fetch.
-    */
+    */ 
+    //#endregion
     .then(([ejerciciosResultados, categoriasResultados, relacionesResultados]) => {
+        console.log("Resultados ejercicios:", ejerciciosResultados);
+        console.log("Resultados categorias:", categoriasResultados);
+        console.log("Resultados relaciones:", relacionesResultados);
+        //#region
         /*
         ejerciciosData fue el objeto definido en la línea 16.
         Aquí le estamos diciendo que nuestro objeto su nuevo valor será
@@ -78,6 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ejercicios: (53) [{…}, {…}, etc etc. con todo lo que trajo mi consulta, así que le digo que ejerciciosData ahora tiene dichos valores.
         en @app.get("/ejercicios") dentro de main.py definí un diccionario en python, es por eso que sé que es la propiedad que busco con ese nombre.
         */
+        //#endregion
         ejerciciosData = ejerciciosResultados.ejercicios || [];
         relacionesData = relacionesResultados.ejercicios_categorias || [];
 
@@ -106,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
             tbody.innerHTML = `<tr><td colspan="3" style="color: red; text-align: center;">Error al cargar los datos iniciales.</td></tr>`;
         }
     });
-
+    //Declaramos la función usando las categorias como parámetros
     function generarBotonesFiltro(categorias) {
         const contenedor = document.getElementById('filtros-container');
          if (!contenedor) return; // <<< NUEVO: Salir si no se encuentra el contenedor
@@ -140,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
              console.error("'categorias' recibidas en generarBotonesFiltro no es un array:", categorias); // <<< NUEVO: Error si no es array
         }
     }
-
+    //Correspondiente al EventListener de los botones creados.
     function filtrarPorCategoria(categoriaId) {
         //Declaramos lo que será enviado a la función actualizarTabla
 
