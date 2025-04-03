@@ -103,8 +103,7 @@ async def obtener_ejercicios():
                 ejercicios.append({
                     "id": row[0],
                     "nombre": row[1],
-                    "descripcion": row[2],
-                    "imagenUrl": row[3]
+                    "descripcion": row[2]
                 })
             return {"ejercicios": ejercicios}
             
