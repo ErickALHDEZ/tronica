@@ -69,3 +69,30 @@
     margin-top: 10px; /* Espacio sobre la imagen */
     border: 1px solid #eee; /* Borde sutil */
 }
+
+/* Estilo para la celda del nombre, indicando que es clickeable */
+.nombre-ejercicio {
+  cursor: pointer; /* Cambia el cursor a una mano para indicar que se puede hacer clic */
+  font-weight: bold; /*Hace el nombre más visible */
+}
+
+.nombre-ejercicio:hover {
+  color: #9e2668; /*Cambia el color al pasar el ratón por encima*/
+}
+
+/* Fila de detalles inicialmente oculta */
+.details-row {
+display: none; /*Oculta esta fila por defecto */
+background-color: #f9f9f9; /* Fondo ligero para diferenciarla */
+}
+
+/* Celda que contiene los detalles */
+.details-cell {
+  padding: 15px; /* Espacio interno para que el contenido no esté pegado a los bordes */
+}
+
+.details-cell h4 { /* Estilo para los títulos "Descripción:" y "Categorías:" */
+  margin-top: 0;
+  margin-bottom: 5px;
+  color: #333;
+}

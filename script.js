@@ -206,25 +206,56 @@ document.addEventListener('DOMContentLoaded', function() {
             // Une los elementos del array de nombres de categorías en una única cadena de texto.
             // Los nombres de las categorías se separan por una coma y un espacio (', ').
             .join(', ');
-        
-          /*Crea una plantilla de cadena de texto (template literal) que representa una fila de tabla ('<tr>').
-          Dentro de la fila, se definen tres celdas de tabla ('<td>'):
-          - La primera celda contiene el valor de la propiedad 'nombre' del objeto 'ejercicio'.
-          - La segunda celda contiene el valor de la propiedad 'descripcion' del objeto 'ejercicio'.
-          - La tercera celda contiene la cadena de texto 'categoriasEjercicio' que representa las categorías del ejercicio.
-          */
-          const fila = `
-              <tr>
-                <td>${ejercicio.nombre}</td>
-                <td>${ejercicio.descripcion}</td>
-                <td>${categoriasEjercicio}</td>
-              </tr>
+
+            //A partir de aquí se realizó el cambio para mostrar detalles 07/04/25
+
+             //Crea la fila principal con solo el nombre del ejercicio.
+             const filaPrincipal = document.createElement('tr');//Crea un elemento <tr>
+            const celdaNombre = document.createElement('td');//Crea un elemento <td>
+            celdaNombre.textContent = ejercicio.nombre;//Pone el nombre del ejercicio dentro del <td>
+            celdaNombre.classList.add('nombre-ejercicio');//Añade la clase CSS que definimos antes para el estilo y el cursor
+            filaPrincipal.appendChild(celdaNombre);//Añade la celda <td> a la fila <tr>
+
+            //Crea la fila de detalles que está oculta inicialmente
+            const filaDetalles = document.createElement('tr'); // Crea otra fila <tr> para los detalles
+            filaDetalles.classList.add('details-row');// Añade la clase CSS para que esté oculta por defecto
+
+            const celdaDetalles = document.createElement('td'); // Crea la celda <td> para los detalles
+            // colspan="1" porque ahora solo hay una columna visible en la cabecera (Nombre)
+            celdaDetalles.setAttribute('colspan', '1');// Hace que esta celda ocupe todo el ancho de la tabla
+            celdaDetalles.classList.add('details-cell'); // Añade la clase CSS para el para el padding y estilo interno  
+            
+
+            // Crear el contenido HTML para la celda de detalles
+            celdaDetalles.innerHTML = `
+            <h4>Descripción:</h4>
+            <p>${ejercicio.descripcion || 'No disponible'}</p>
+            <h4>Categorías:</h4>
+            <p>${categoriasEjercicio}</p>
             `;
-          /*
-          Agrega la cadena HTML de la 'fila' al contenido HTML existente del elemento 'tbody'.
-          Esto inserta una nueva fila en la tabla con los datos del ejercicio actual.
-          */
-          tbody.innerHTML += fila;
+            filaDetalles.appendChild(celdaDetalles); // Añade la celda de detalles a la fila de detalles
+
+            //Añadir ambas filas al tbody de la tabla
+            tbody.appendChild(filaPrincipal);//Añade la fila con el nombre
+            tbody.appendChild(filaDetalles);//Añade la fila oculta con los detalles justo después
+
+            //Añadir el evento de click a la celda del nombre (celdaNombre).
+            celdaNombre.addEventListener('click', () => {
+            //'filaPrincipal' es la fila que contiene el nombre en el que se hizo clic.
+            //'nextElementSibling' selecciona el elemento hermano que viene inmediatamente después en el HTML.
+            //Como añadimos filaDetalles justo después de filaPrincipal, nextElementSibling será la fila de detalles.
+            const detalles = filaPrincipal.nextElementSibling;
+
+            //Comprobamos el estilo 'display' actual de la fila de detalles.
+            if (detalles.style.display === 'table-row') {
+                //Si está visible ('table-row'), la oculta cambiando display a 'none'.
+                detalles.style.display = 'none';
+            } else {
+                //Si está oculta ('none' o cualquier otra cosa), la muestra cambiando display a 'table-row'.
+                //Usamos 'table-row' porque es el valor por defecto para display en un <tr>.
+                detalles.style.display = 'table-row';
+            }
+            })
         });
       }
 });
