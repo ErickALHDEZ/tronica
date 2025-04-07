@@ -230,6 +230,12 @@ document.addEventListener('DOMContentLoaded', function() {
             celdaDetalles.innerHTML = `
             <h4>Descripción:</h4>
             <p>${ejercicio.descripcion || 'No disponible'}</p>
+            <h4>Ejemplo visual:</h4>
+            <img src="${ejercicio.ImagenUrl}"
+                 alt="Ejemplo visual de ${ejercicio.nombre || 'ejercicio'}"
+                 class="visual-example-img"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <span style="display:none; color: #888;">(Imagen no disponible)</span>
             <h4>Categorías:</h4>
             <p>${categoriasEjercicio}</p>
             `;
